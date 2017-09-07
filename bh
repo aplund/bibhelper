@@ -1,0 +1,289 @@
+#!/bin/bash
+
+function getbase {
+	if [ ! -d "$1" ]; then
+		return 1
+	fi
+
+	pushd "$1" > /dev/null
+
+	while [ ! -f ".bibbase" ]; do
+		if [ "$PWD" == "/" ]; then
+			return 1
+		fi
+		cd ..
+	done
+
+	result="$PWD"
+	popd > /dev/null
+}
+
+
+function isEntry {
+	[ -d "$1" ] && [ -f "$1/.entry" ]
+}
+
+
+# What about NUL?? Seems to break things in BASH.
+# _ -> \x5f
+# \ -> \x5c
+# / -> \x2f
+# % -> \x25
+# A minimal set.  Printf will consume all \ and %, / disallowed by filesystem
+# and we want to avoid the final \'s in the filenames
+
+function encodestring {
+	result="$1"
+	result="${result//_/_x5f}"
+	result="${result//\\/_x5c}"
+	result="${result//\//_x2f}"
+	result="${result//%/_x25}"
+#	result="${result//./_x2e}"
+}
+
+function decodestring {
+	result="$1"
+#	result="${result//_x2e/.}"
+	result="${result//_x25/%}"
+	result="${result//_x2f/\/}"
+	result="${result//_x5f/_}"
+	result="${result//_x5c/\\}"
+}
+
+function printstring {
+	prot=$1
+	shift
+	IFS="" result="$prot:$*"
+}
+
+declare -a ENTRIES
+function entriesorpwd {
+	if [ "$#" -eq 0 ]
+	then
+		ENTRIES[0]=$PWD
+	else
+		ENTRIES=("$@")
+	fi
+}
+
+function getentry {
+	declare testpath=${1%.entry}
+	isEntry "$testpath" || return 1
+	getbase "$testpath" || return 1
+
+	declare -a array
+	
+	pushd "$testpath" > /dev/null
+	while [ "$PWD" != "$result" ]; do
+		array=("${PWD##*/}" "${array[@]}" )
+		cd ..
+	done
+	popd > /dev/null
+
+	IFS="" rawstring="${array[0]}:${array[*]:1}"
+	decodestring "$rawstring"
+}
+
+function printentry {
+	entriesorpwd "$@"
+	for i in "${ENTRIES[@]}"
+	do	
+		if getentry "$i" 
+		then
+			echo "$result"	
+		else
+			echo "Not an entry"
+		fi
+	done
+}
+
+#convert string to path
+#must be called from within database
+#special handling of "." and ".."  They are disallowed as divisions!
+function getpath {
+	getbase $PWD
+	base=$result
+
+	encodestring "${1#*:}"
+	declare suffix="$result"
+	suffix="${suffix,,}" #lowercase
+	result="${1%%:*}"
+	result="${result,,}"
+
+	declare st=0 j=0 t
+	
+	pushd $base > /dev/null
+	#for (( j=1, st=0 ; j <= ${#suffix} ; j=j+1 )); do
+	while [ $j -le ${#suffix} ]; do
+		j=$((j+1))
+		app="${suffix:$st:$j-$st}"
+		if [ "$app" == "." -o "$app" == ".." ]; then
+			continue
+		fi
+		t="$result/$app"
+		if [ -d "$t" ]; then
+			result=$t
+			st=$j
+		fi
+	done
+	popd > /dev/null
+	result=$t
+}
+
+function printpath {
+	for i in "$@"; do
+		getpath "$i"
+		echo "$result"
+	done
+}
+
+function enc {
+	encodestring "$1"
+	echo "$result"
+}
+
+function add {
+	for i in "$@"
+	do
+		getpath "$i"
+		p=$result
+		getbase $PWD
+		mkdir -p "$result/$p"
+		touch "$result/$p/.entry"
+	done
+}
+
+function reflow_single {
+	getbase "$1"
+	base=$result
+
+	getentry "$1" || return 1
+	getpath "$result"
+	newpath="$base/$result"
+	if [ ! "$1" -ef "$newpath" ]; then
+		mv "$1" "$newpath"
+	fi
+}
+
+function reflow {
+	entriesorpwd "$@"
+	for i in "${ENTRIES[@]}"; do
+		reflow_single "$i" || continue
+	done
+}
+
+agent="Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0"
+
+function getbib_doi {
+	if [ "$#" -eq "0" ]; then
+		return
+	fi
+	declare -a args
+	args+=("-L" "-s")
+	args+=("-A" "$agent")
+	args+=("-H" "Accept: application/x-bibtex")
+	for i in "$@"; do
+		echo $i
+		getentry "$i" || {
+			echo "Bad entry: $p Skipping."
+		       	continue
+		}
+		args+=("-o" "$i/bib")
+		args+=("${result/doi:/http://doi.org/}")
+	done
+	curl "${args[@]}"
+}
+
+function getbib_isbn {
+	if [ "$#" -eq "0" ]; then
+		return
+	fi
+	declare -a args
+	args+=("-L" "-s")
+	args+=("-A" "$agent")
+	for i in "$@"; do
+		#echo $i
+		getentry "$i" || {
+			echo "Bad entry: $p Skipping"
+		       	continue
+		}
+		args+=("http://www.ottobib.com/${result/isbn:/isbn/}/bibtex")
+		echo -n "Fetching $result... "
+		var=$(curl "${args[@]}")
+		if [ -z $var ]; then
+			echo "Failed, no entry returned."
+			continue
+		else
+			echo "Done."
+		fi
+		var1="@Book${var##*@Book}"
+		echo ${var1%%</textarea>*} > "$i/bib"
+	done
+
+}
+
+function getbib {
+	declare -a doi
+	declare -a isbn
+	declare -a arxiv
+	declare -a rest
+	doi=()
+	for i in "$@"; do
+		p=${i%.entry}
+		[ -d "$p" ] || {
+			echo "Not found: $p Skipping."
+		       	continue
+		}
+		[ ! -e "$p/bib" ] || {
+			echo "Bib exists: $p/bib Skipping"
+		       	continue
+		}
+		getentry "$p"
+		case "$result" in
+		doi:*)
+			doi+=("$p")
+			;;
+		isbn:*)
+			isbn+=("$p")
+			;;
+		arXiv:*)
+			arxiv+=("$p")
+			;;
+		*)
+			rest+=("$p")
+			;;
+		esac
+	done
+	getbib_doi "${doi[@]}"
+	#echo ===DOI===
+	#echo "${doi[@]}"
+	getbib_isbn "${isbn[@]}"
+	#echo ===ISBN===
+	#echo "${isbn[@]}"
+	#echo ===ARXIV===
+	#echo "${arxiv[@]}"
+	#echo ===REST===
+	#echo "${rest[@]}"
+}
+
+#not working?
+function addget {
+	add "$@"	
+	declare -a p
+	for i in "$@"; do
+		getpath "$i"
+		p+=("$result")
+	done
+	echo "${p[@]}"
+	getbib "${p[@]}"
+}
+
+function bibgrep {
+	getbase "$PWD"
+	find $result -name bib -print0 | xargs -0 grep -i "$@"
+}
+
+func="$1"
+shift
+"$func" "$@"
+

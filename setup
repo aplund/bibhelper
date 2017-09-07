@@ -1,0 +1,24 @@
+#!/bin/sh
+
+bh=/home/lund/src/bibhelper/bh
+li=/home/lund/src/bibhelper/list
+
+
+mkdir /tmp/test
+
+cd /tmp/test
+touch .bibbase
+
+mkdir doi
+mkdir arXiv
+mkdir isbn
+
+mkdir arXiv/$($bh enc quant-ph/)
+
+time cat $li | xargs $bh add
+
+mkdir doi/$($bh enc 10.1103/)
+mkdir doi/$($bh enc 10.1103/)/$($bh enc physreva.)
+
+time find . -name .entry -printf %h\\0 | xargs -0 $bh reflow
+
