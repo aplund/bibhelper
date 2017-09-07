@@ -1,24 +1,46 @@
 #!/bin/sh
 
-bh=/home/lund/src/bibhelper/bh
-li=/home/lund/src/bibhelper/list
+bh="$PWD/bh"
+li="$PWD/list"
+testdir="/tmp/bh-test-$(date -u +"%F.%T")-$RANDOM"
 
+failcount=0
+failtest () {
+	echo "FAILURE:" $1
+	failcount=$(($failcount + 1))
+}
 
-mkdir /tmp/test
+mkdir "$testdir"
 
-cd /tmp/test
+cd "$testdir"
 touch .bibbase
 
+# Non-existant repo tests
+if "$bh" add junk:junk ; then failtest "Add junk test failed" ; fi
+if [ -d junk ] ; then failtest "Junk repo folder added" ; fi
+if [ -d junk/junk ] ; then failtest "Junk entry folder added" ; fi
+if [ -f junk/junk/.bibentry ] ; then printf "Junk entry file added" ; fi
+
 mkdir doi
-mkdir arXiv
+mkdir arxiv
 mkdir isbn
 
-mkdir arXiv/$($bh enc quant-ph/)
+# Add entry tests
+#mkdir arxiv/$($bh enc quant-ph/)
 
+echo "Adding entries:"
 time cat $li | xargs $bh add
+tree -a
 
+# Reflow tests
 mkdir doi/$($bh enc 10.1103/)
 mkdir doi/$($bh enc 10.1103/)/$($bh enc physreva.)
 
+echo "Reflowing entries"
 time find . -name .entry -printf %h\\0 | xargs -0 $bh reflow
 
+tree -a
+
+rm -rf "$testdir"
+
+echo Failures: $failcount
