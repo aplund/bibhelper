@@ -170,11 +170,17 @@ function add {
 }
 
 function reflow_single {
-	getbase "$1"
-	base=$result
+	getentry "$1" || {
+		echo "${FUNCNAME[0]} getentry failed ($?): $1"
+		return 1
+	}
 
-	getentry "$1" || return 1
-	getpath "$result"
+	#getpath sets $base and $result
+	getpath "$result" || {
+		echo "${FUNCNAME[0]} getentry failed ($?): $1"
+		return 2
+	}
+
 	newpath="$base/$result"
 	if [ ! "$1" -ef "$newpath" ]; then
 		mv "$1" "$newpath"
@@ -298,7 +304,7 @@ function bibgrep {
 	find $result -name bib -print0 | xargs -0 grep -i "$@"
 }
 
-verbs=("bibgrep" "add" "addget" "getbib" "printentry")
+verbs=("bibgrep" "add" "addget" "getbib" "printentry" "reflow")
 
 func="$1"
 shift
