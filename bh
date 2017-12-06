@@ -63,7 +63,7 @@ function entriesorpwd {
 function getentry {
 	declare testpath=${1%.entry}
 	isEntry "$testpath" || return 1
-	getbase "$testpath" || return 1
+	getbase "$testpath" || return 2
 
 	declare -a array
 	
