@@ -101,14 +101,20 @@ function printentry {
 #must be called from within database
 #special handling of "." and ".."  They are disallowed as divisions!
 function getpath {
-	getbase $PWD
+	getbase $PWD || return 1
 	base=$result
 
 	encodestring "${1#*:}"
 	declare suffix="$result"
-	suffix="${suffix,,}" #lowercase
-	result="${1%%:*}"
-	result="${result,,}"
+	suffix="${suffix,,}" # to lowercase
+	result="${1%%:*}" # prefix
+	result="${result,,}" # to lowercase
+
+	# Root _must_ exist
+	if [ ! -d "$base/$result" ]; then
+		unset result
+		return 2
+	fi
 
 	declare st=0 j=0 t
 	
@@ -132,7 +138,10 @@ function getpath {
 
 function printpath {
 	for i in "$@"; do
-		getpath "$i"
+		getpath "$i" || {
+			echo "Bad string ($?): $i"
+			continue
+		}
 		echo "$result"
 	done
 }
