@@ -184,7 +184,10 @@ function reflow_single {
 function reflow {
 	entriesorpwd "$@"
 	for i in "${ENTRIES[@]}"; do
-		reflow_single "$i" || continue
+		reflow_single "$i" || {
+			echo "${FUNCNAME[0]} reflow_single failed: $i. Skipping"
+			continue
+		}
 	done
 }
 
