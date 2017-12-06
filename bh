@@ -50,12 +50,6 @@ function decodestring {
 	result="${result//_x5c/\\}"
 }
 
-function printstring {
-	prot=$1
-	shift
-	IFS="" result="$prot:$*"
-}
-
 declare -a ENTRIES
 function entriesorpwd {
 	if [ "$#" -eq 0 ]
