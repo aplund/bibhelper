@@ -142,7 +142,7 @@ function getpath {
 function printpath {
 	for i in "$@"; do
 		getpath "$i" || {
-			echo "Bad string ($?): $i"
+			echo "${FUNCNAME[0]} Bad string ($?): $i"
 			continue
 		}
 		echo "$result"
@@ -158,7 +158,7 @@ function add {
 	for i in "$@"
 	do
 		getpath "$i" || {
-			echo "Bad string ($?): $i. Skipping."
+			echo "${FUNCNAME[0]} Bad string ($?): $i. Skipping."
 			continue
 		} # getpath sets $base and $result
 		mkdir -p "$base/$result"
@@ -284,7 +284,10 @@ function addget {
 	add "$@"	
 	declare -a p
 	for i in "$@"; do
-		getpath "$i"
+		getpath "$i" || {
+			echo "${FUNCNAME[0]} Bad path ($?): $i. Skipping"
+			continue
+		}
 		p+=("$result")
 	done
 	echo "${p[@]}"
