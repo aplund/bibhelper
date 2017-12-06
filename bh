@@ -100,6 +100,9 @@ function printentry {
 #convert string to path
 #must be called from within database
 #special handling of "." and ".."  They are disallowed as divisions!
+#returned variables:
+#	$base: base component
+#	$result: path suffix
 function getpath {
 	getbase $PWD || return 1
 	base=$result
@@ -154,11 +157,12 @@ function enc {
 function add {
 	for i in "$@"
 	do
-		getpath "$i"
-		p=$result
-		getbase $PWD
-		mkdir -p "$result/$p"
-		touch "$result/$p/.entry"
+		getpath "$i" || {
+			echo "Bad string ($?): $i. Skipping."
+			continue
+		} # getpath sets $base and $result
+		mkdir -p "$base/$result"
+		touch "$base/$result/.entry"
 	done
 }
 
