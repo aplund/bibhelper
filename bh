@@ -299,12 +299,12 @@ function addget {
 	getbib "${added[@]}"
 }
 
-function bibgrep {
+function grep {
 	getbase "$PWD"
 	find $result -name bib -print0 | xargs -0 grep -i "$@"
 }
 
-verbs=("bibgrep" "add" "addget" "getbib" "printentry" "reflow")
+verbs=("grep" "add" "addget" "getbib" "printentry" "reflow")
 
 func="$1"
 shift
