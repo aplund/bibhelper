@@ -154,15 +154,19 @@ function enc {
 	echo "$result"
 }
 
+# returns $result array of successfully added entries
 function add {
+	declare -ga result=()
 	for i in "$@"
 	do
 		getpath "$i" || {
 			echo "${FUNCNAME[0]} Bad string ($?): $i. Skipping."
 			continue
 		} # getpath sets $base and $result
-		mkdir -p "$base/$result"
-		touch "$base/$result/.entry"
+		d="$base/$result"
+		mkdir -p "$d"
+		touch "$d/.entry"
+		result+=("$d")
 	done
 }
 
