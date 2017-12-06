@@ -301,7 +301,14 @@ function bibgrep {
 	find $result -name bib -print0 | xargs -0 grep -i "$@"
 }
 
+verbs=("bibgrep" "add" "addget" "getbib" "printentry")
+
 func="$1"
 shift
-"$func" "$@"
+if [[ "${verbs[*]}" = *"${func}"* ]]; then
+	"$func" "$@"
+else
+	echo "Unknown verb: $func"
+	exit 1
+fi
 
