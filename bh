@@ -156,7 +156,7 @@ function enc {
 
 # returns $result array of successfully added entries
 function add {
-	declare -ga result=()
+	declare -a addedpaths=()
 	for i in "$@"
 	do
 		getpath "$i" || {
@@ -164,10 +164,15 @@ function add {
 			continue
 		} # getpath sets $base and $result
 		d="$base/$result"
+		[ -d "$d" ] && {
+			echo "${FUNCNAME[0]} Entry exists: $d. Skipping."
+			continue
+		}
 		mkdir -p "$d"
 		touch "$d/.entry"
-		result+=("$d")
+		addedpaths+=("$d")
 	done
+	result=("${addedpaths[@]}")
 }
 
 function reflow_single {
@@ -285,17 +290,10 @@ function getbib {
 
 #not working?
 function addget {
-	add "$@"	
-	declare -a p
-	for i in "$@"; do
-		getpath "$i" || {
-			echo "${FUNCNAME[0]} Bad path ($?): $i. Skipping"
-			continue
-		}
-		p+=("$result")
-	done
-	echo "${p[@]}"
-	getbib "${p[@]}"
+	add "$@" #returns $result array
+	added=("${result[@]}")
+	echo "${added[@]}"
+	getbib "${added[@]}"
 }
 
 function bibgrep {
