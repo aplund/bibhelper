@@ -205,7 +205,7 @@ function getbib_doi {
 	args+=("-A" "$agent")
 	args+=("-H" "Accept: application/x-bibtex")
 	for i in "$@"; do
-		echo $i
+		#echo $i
 		getentry "$i" || {
 			echo "Bad entry: $p Skipping."
 		       	continue
