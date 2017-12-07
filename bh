@@ -255,7 +255,8 @@ function getbib {
 	declare -a arxiv
 	declare -a rest
 	doi=()
-	for i in "$@"; do
+	entriesorpwd "$@"
+	for i in "${ENTRIES[@]}"; do
 		p=${i%.entry}
 		[ -d "$p" ] || {
 			echo "Not found: $p Skipping."
