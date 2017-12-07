@@ -218,7 +218,15 @@ function getbib_doi {
 		args+=("-o" "$i/bib")
 		args+=("${result/doi:/http://doi.org/}")
 	done
-	curl "${args[@]}"
+	curl "${args[@]}" || return 1
+
+	# Post-process
+	tmpfile="$(mktemp)"
+	for i in "$@"; do
+		sed 's/{\\hspace{0.167em}}/ /g' "$i"/bib > "$tmpfile"
+		mv -f "$tmpfile" "$i"/bib
+	done
+	rm -f "$tmpfile"
 }
 
 function getbib_isbn {
