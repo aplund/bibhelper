@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s globstar
+
 function getbase {
 	if [ ! -d "$1" ]; then
 		return 1
@@ -299,12 +301,13 @@ function addget {
 	getbib "${added[@]}"
 }
 
-function grep {
+function bibgrep {
 	getbase "$PWD"
-	find $result -name bib -print0 | xargs -0 grep -i "$@"
+	printf '%s\0' "$result"/**/bib | xargs -0 grep -l "$@" | xargs dirname
+	#find $result -name bib -print0 | xargs -0 grep -i "$@"
 }
 
-verbs=("grep" "add" "addget" "getbib" "printentry" "reflow")
+verbs=("bibgrep" "add" "addget" "getbib" "printentry" "reflow")
 
 func="$1"
 shift
