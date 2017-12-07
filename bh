@@ -307,7 +307,18 @@ function bibgrep {
 	#find $result -name bib -print0 | xargs -0 grep -i "$@"
 }
 
-verbs=("bibgrep" "add" "addget" "getbib" "printentry" "reflow")
+function summary {
+	entriesorpwd "$@"
+	for i in "${ENTRIES[@]}"; do
+		sed -n '/.*doi.*=.*{\(.*\)}.*/{s//\1/; p; q}' "$i"/bib
+		sed -n '/@\(.\+\){.*/{s//\U\1/; p; q}' "$i"/bib
+		sed -n '/.*author.*=.*{\(.*\)}.*/{s//\1/; p; q}' "$i"/bib
+		sed -n '/.*title.*=.*{\(.*\)}.*/{s//\1/; p; q}' "$i"/bib
+		echo
+	done
+}
+
+verbs=("summary" "bibgrep" "add" "addget" "getbib" "printentry" "reflow")
 
 func="$1"
 shift
