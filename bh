@@ -318,7 +318,7 @@ function summary {
 	done
 }
 
-verbs=("summary" "bibgrep" "add" "addget" "getbib" "printentry" "reflow")
+verbs=("summary" "bibgrep" "add" "addget" "getbib" "printentry" "printpath" "reflow")
 
 func="$1"
 shift
