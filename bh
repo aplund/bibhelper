@@ -112,6 +112,11 @@ function printentry {
 #	$base: base component
 #	$result: path suffix
 function getpath {
+	# String must contain a : to separate the prefix from suffix
+	if [[ "$1" != *":"* ]] ; then
+		return 2
+	fi
+
 	getbase $PWD || return 1
 	base=$result
 
