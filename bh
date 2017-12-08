@@ -153,7 +153,11 @@ function getpath {
 }
 
 function printpath {
-	for i in "$@"; do
+	local i
+	while
+		i="$1"
+		shift
+	do
 		getpath "$i" || {
 			echo "${FUNCNAME[0]} Bad string ($?): $i"
 			continue
