@@ -324,8 +324,8 @@ function addget {
 
 function bibgrep {
 	getbase "$PWD"
-	printf '%s\0' "$result"/**/bib | xargs -0 grep -l "$@" | xargs dirname
-	#find $result -name bib -print0 | xargs -0 grep -i "$@"
+	ents=$(printf '%s\0' "$result"/**/bib | xargs -0 grep -l "$@" | xargs dirname)
+	printentry $ents
 }
 
 function summary {
