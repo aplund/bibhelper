@@ -195,31 +195,26 @@ function add {
 	result=("${addedpaths[@]}")
 }
 
-function reflow_single {
-	getentry "$1" || {
-		echo "${FUNCNAME[0]} getentry failed ($?): $1"
-		return 1
-	}
-
-	#getpath sets $base and $result
-	getpath "$result" || {
-		echo "${FUNCNAME[0]} getentry failed ($?): $1"
-		return 2
-	}
-
-	newpath="$base/$result"
-	if [ ! "$1" -ef "$newpath" ]; then
-		mv "$1" "$newpath"
-	fi
-}
-
 function reflow {
-	entriesorpwd "$@"
-	for i in "${ENTRIES[@]}"; do
-		reflow_single "$i" || {
-			echo "${FUNCNAME[0]} reflow_single failed: $i. Skipping"
+	getbase $PWD
+	base="$result"
+
+	for i in "$base"/**/.entry; do
+		d="${i%.entry}"
+		getentry "$d" || {
+			echo "${FUNCNAME[0]} getentry failed ($?): $1"
 			continue
 		}
+		ent="$result"
+		getpath "$result" || {
+			echo "${FUNCNAME[0]} getentry failed ($?): $1"
+			continue
+		}
+		newpath="$base/$result"
+		if [ ! "$d" -ef "$newpath" ]; then
+			mv "$d" "$newpath"
+			echo "Reflowed: $ent"
+		fi
 	done
 }
 
