@@ -169,8 +169,11 @@ function enc {
 
 # returns $result array of successfully added entries
 function add {
-	declare -a addedpaths=()
-	for i in "$@"
+	local -a addedpaths=()
+	local i
+	while
+		i="$1"
+		shift
 	do
 		getpath "$i" || {
 			echo "${FUNCNAME[0]} Bad string ($?): $i. Skipping."
