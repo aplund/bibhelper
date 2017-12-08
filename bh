@@ -11,7 +11,14 @@ function getbase {
 
 	while [ ! -f ".bibbase" ]; do
 		if [ "$PWD" == "/" ]; then
-			return 1
+			if [ -z "$BIBBASE" ] &&
+				[ ! -f "${BIBBASE}/.bibbase"]; then
+				return 1
+			else
+				result="$BIBBASE"
+				popd > /dev/null
+				return 0
+			fi
 		fi
 		cd ..
 	done
