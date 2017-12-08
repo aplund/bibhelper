@@ -331,11 +331,12 @@ function bibgrep {
 function summary {
 	entriesorpwd "$@"
 	for i in "${ENTRIES[@]}"; do
+		getpath $i
 		sed -n '
 /[[:space:]]*doi[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//doi:\1/; p}
 /[[:space:]]*isbn[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//isbn:\1/; p}
 /[[:space:]]*title[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}
-/[[:space:]]*author[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}' "$i"/bib
+/[[:space:]]*author[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}' "$base/$result"/bib
 		echo
 	done
 }
