@@ -340,7 +340,14 @@ function summary {
 	done
 }
 
-verbs=("summary" "bibgrep" "add" "addget" "getbib" "printentry" "printpath" "reflow")
+function list {
+	getbase
+	for i in "${result}"/**/.entry; do
+		getentry "$i" && echo $result
+	done
+}
+
+verbs=("list" "summary" "bibgrep" "add" "addget" "getbib" "printentry" "printpath" "reflow")
 
 func="$1"
 shift
