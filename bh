@@ -366,7 +366,10 @@ verbs+=("reflow" "base")
 
 func="$1"
 shift
-if [[ "${verbs[*]}" = *"${func}"* ]]; then
+if [ -z "$func" ]; then
+	echo "Known verbs:" "${verbs[@]}"
+	exit 1
+elif [[ "${verbs[*]}" == *"${func}"* ]]; then
 	"$func" "$@"
 else
 	echo "Unknown verb: $func"
