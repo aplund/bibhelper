@@ -367,12 +367,16 @@ verbs+=("reflow" "base")
 func="$1"
 shift
 if [ -z "$func" ]; then
+	getbase
+	echo "Base directory: " "$result"
+	declare -a paths=("$result"/**/.entry)
+	echo "Number of entries:" "${#paths[*]}"
 	echo "Known verbs:" "${verbs[@]}"
 	exit 1
 elif [[ "${verbs[*]}" == *"${func}"* ]]; then
 	"$func" "$@"
 else
 	echo "Unknown verb: $func"
-	exit 1
+	exit 2
 fi
 
