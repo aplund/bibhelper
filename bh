@@ -32,6 +32,28 @@ function getbase {
 	popd > /dev/null
 }
 
+# Setup $BIBBASE
+pushd "$PWD" > /dev/null
+
+while [ ! -f "$PWD"/.bibbase -a "$PWD" != "/" ] ; do
+	cd ..
+done
+
+if [[ "$PWD" == "/" ]]; then
+	if [ -f "/.bibbase" ]; then
+		BIBBASE="/"   # But seriously, don't do this.
+	elif [ -z "$BIBBASE" ]; then
+		echo "\$BIBBASE unset and no database in path"
+		exit 1
+	elif [ ! -f "${BIBBASE}/.bibbase" ]; then
+		echo "$BIBBASE is not a database"
+		exit 1
+	fi
+else
+	BIBBASE="$PWD"
+fi
+
+popd > /dev/null
 
 function isEntry {
 	[ -d "$1" ] && [ -f "$1/.entry" ]
@@ -367,9 +389,8 @@ verbs+=("reflow" "base")
 func="$1"
 shift
 if [ -z "$func" ]; then
-	getbase
-	echo "Base directory: " "$result"
-	declare -a paths=("$result"/**/.entry)
+	echo "Base directory: " "$BIBBASE"
+	declare -a paths=("$BIBBASE"/**/.entry)
 	echo "Number of entries:" "${#paths[*]}"
 	echo "Known verbs:" "${verbs[@]}"
 	exit 1
