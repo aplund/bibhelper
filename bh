@@ -128,19 +128,14 @@ function printentry {
 }
 
 #convert string to path
-#must be called from within database
 #special handling of "." and ".."  They are disallowed as divisions!
 #returned variables:
-#	$base: base component
-#	$result: path suffix
+#	$result: path relative to $BIBBASE
 function getpath {
 	# String must contain a : to separate the prefix from suffix
 	if [[ "$1" != *":"* ]] ; then
 		return 2
 	fi
-
-	getbase $PWD || return 1
-	base=$result
 
 	encodestring "${1#*:}"
 	declare suffix="$result"
@@ -149,14 +144,14 @@ function getpath {
 	result="${result,,}" # to lowercase
 
 	# Root _must_ exist
-	if [ ! -d "$base/$result" ]; then
+	if [ ! -d "$BIBBASE/$result" ]; then
 		unset result
 		return 2
 	fi
 
 	declare st=0 j=0 t
 	
-	pushd $base > /dev/null
+	pushd $BIBBASE > /dev/null
 	#for (( j=1, st=0 ; j <= ${#suffix} ; j=j+1 )); do
 	while [ $j -le ${#suffix} ]; do
 		j=$((j+1))
@@ -184,7 +179,7 @@ function printpath {
 			echo "${FUNCNAME[0]} Bad string ($?): $i"
 			continue
 		}
-		echo "$result"
+		echo "$BIBBASE/$result"
 	done
 }
 
