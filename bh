@@ -347,8 +347,7 @@ function addget {
 }
 
 function bibgrep {
-	getbase "$PWD"
-	ents=$(printf '%s\0' "$result"/**/bib | xargs -0 grep -l "$@" | xargs dirname)
+	ents=$(printf '%s\0' "$BIBBASE"/**/bib | xargs -0 grep -l "$@" | xargs dirname)
 	printentry $ents
 }
 
@@ -376,10 +375,11 @@ function base {
 	getbase $PWD && echo $result
 }
 
-verbs=("list" "summary" "bibgrep")
-verbs+=("add" "addget" "getbib")
-verbs+=("printentry" "printpath")
-verbs+=("reflow" "base")
+verbs=("list" "bibgrep")
+#verbs+=("summary" "bibgrep")
+#verbs+=("add" "addget" "getbib")
+#verbs+=("printentry" "printpath")
+#verbs+=("reflow" "base")
 
 func="$1"
 shift
