@@ -312,7 +312,10 @@ function getbib {
 			echo "Bib exists: $p/bib Skipping"
 		       	continue
 		}
-		getentry "$p"
+		getentry "$p" ||  {
+			echo "Not an entry: $p Skipping."
+			continue
+		}
 		case "$result" in
 		doi:*)
 			doi+=("$p")
