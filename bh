@@ -115,11 +115,9 @@ function getentry {
 }
 
 function printentry {
-	entriesorpwd "$@"
-	for i in "${ENTRIES[@]}"
+	for i in "$@"
 	do	
-		if getentry "$i"
-		then
+		if getentry "$i"; then
 			echo "$result"	
 		else
 			echo "Not an entry"
