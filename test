@@ -11,9 +11,9 @@ failtest () {
 }
 
 mkdir "$testdir"
-
 cd "$testdir"
-touch .bibbase
+
+$bh init
 
 # Non-existant repo tests
 if "$bh" add junk:junk ; then failtest "Add junk test failed" ; fi
@@ -21,15 +21,9 @@ if [ -d junk ] ; then failtest "Junk repo folder added" ; fi
 if [ -d junk/junk ] ; then failtest "Junk entry folder added" ; fi
 if [ -f junk/junk/.bibentry ] ; then printf "Junk entry file added" ; fi
 
-mkdir doi
-mkdir arxiv
-mkdir isbn
-
-# Add entry tests
-#mkdir arxiv/$($bh enc quant-ph/)
-
 echo "Adding entries:"
 time cat $li | xargs $bh add
+echo "Return: " $?
 tree -a
 
 # Reflow tests
@@ -38,6 +32,7 @@ mkdir doi/$($bh enc 10.1103/)/$($bh enc physreva.)
 
 echo "Reflowing entries"
 time find . -name .entry -printf %h\\0 | xargs -0 $bh reflow
+echo "Return: " $?
 
 tree -a
 
