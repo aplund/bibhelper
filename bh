@@ -202,8 +202,8 @@ function add {
 		getpath "$i" || {
 			echo "${FUNCNAME[0]} Bad string ($?): $i. Skipping."
 			continue
-		} # getpath sets $base and $result
-		d="$base/$result"
+		}
+		d="$BIBBASE/$result"
 		[ -d "$d" ] && {
 			echo "${FUNCNAME[0]} Entry exists: $d. Skipping."
 			continue
@@ -398,6 +398,7 @@ function open {
 verbs=("list" "bibgrep" "summary")
 verbs+=("printentry" "printpath")
 verbs+=("open" "base")
+verbs+=("add")
 #verbs+=("add" "addget" "getbib")
 #verbs+=("reflow" "base")
 
