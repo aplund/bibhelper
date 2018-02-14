@@ -206,34 +206,45 @@ function reflow {
 
 agent="Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0"
 
+# call with args: entry path ...
+# path relative to $BIBBASE
 function getbib_doi {
+
 	if [ "$#" -eq "0" ]; then
 		return
 	fi
-	declare -a args
+	local -a args
+	local -a files
 	args+=("-L" "-s")
 	args+=("-A" "$agent")
 	args+=("-H" "Accept: application/x-bibtex")
-	for i in "$@"; do
-		#echo $i
-		getentry "$i" || {
-			echo "Bad entry: $p Skipping."
-		       	continue
-		}
-		args+=("-o" "$i/bib")
-		args+=("${result/doi:/http://doi.org/}")
+	while
+		doi=$1
+		shift
+		loc=$1
+		shift
+	do
+		echo $doi $loc
+		if [ ! -d $loc ]; then
+			echo "Bad path: $loc Skippping."
+			continue
+		fi
+		args+=("-o" "$loc/bib")
+		files+=("$loc/bib")
+		args+=("${doi/doi:/http://doi.org/}")
 	done
 	curl "${args[@]}" || return 1
 
 	# Post-process
 	tmpfile="$(mktemp)"
-	for i in "$@"; do
-		sed 's/{\\hspace{0.167em}}/ /g' "$i"/bib > "$tmpfile"
-		mv -f "$tmpfile" "$i"/bib
+	for i in "${files[@]}"; do
+		sed 's/{\\hspace{0.167em}}/ /g' "$i" > "$tmpfile"
+		mv -f "$tmpfile" "$i"
 	done
 	rm -f "$tmpfile"
 }
 
+#need changing to new interface
 function getbib_isbn {
 	if [ "$#" -eq "0" ]; then
 		return
@@ -263,45 +274,43 @@ function getbib_isbn {
 }
 
 function getbib {
-	declare -a doi
-	declare -a isbn
-	declare -a arxiv
-	declare -a rest
-	doi=()
-	entriesorpwd "$@"
-	for i in "${ENTRIES[@]}"; do
-		p=${i%.entry}
-		[ -d "$p" ] || {
-			echo "Not found: $p Skipping."
+	local -a doi
+	local -a isbn
+	local -a arxiv
+	local -a rest
+	for i in "$@"; do
+		getpath $i || {
+			echo "Bad entry: $i Skipping."
+			continue
+		}
+		p=$result
+		isEntry "$BIBBASE/$p" || {
+			echo "Not entry: $p Skipping."
 		       	continue
 		}
-		[ ! -e "$p/bib" ] || {
+		[ ! -e "$BIBBASE/$p/bib" ] || {
 			echo "Bib exists: $p/bib Skipping"
 		       	continue
 		}
-		getentry "$p" ||  {
-			echo "Not an entry: $p Skipping."
-			continue
-		}
-		case "$result" in
+		case "$i" in
 		doi:*)
-			doi+=("$p")
+			doi+=("$i" "$p")
 			;;
 		isbn:*)
-			isbn+=("$p")
+			isbn+=("$i" "$p")
 			;;
 		arXiv:*)
-			arxiv+=("$p")
+			arxiv+=("$i" "$p")
 			;;
 		*)
-			rest+=("$p")
+			rest+=("$i" "$p")
 			;;
 		esac
 	done
 	getbib_doi "${doi[@]}"
 	#echo ===DOI===
 	#echo "${doi[@]}"
-	getbib_isbn "${isbn[@]}"
+	#getbib_isbn "${isbn[@]}"
 	#echo ===ISBN===
 	#echo "${isbn[@]}"
 	#echo ===ARXIV===
@@ -378,6 +387,7 @@ verbs=("list" "bibgrep" "summary")
 verbs+=("printentry" "printpath")
 verbs+=("open" "base")
 verbs+=("add")
+verbs+=("getbib")
 #verbs+=("add" "addget" "getbib")
 #verbs+=("reflow" "base")
 
