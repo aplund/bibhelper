@@ -215,10 +215,7 @@ function add {
 }
 
 function reflow {
-	getbase $PWD
-	base="$result"
-
-	for i in "$base"/**/.entry; do
+	for i in "$BIBBASE"/**/.entry; do
 		d="${i%.entry}"
 		getentry "$d" || {
 			echo "${FUNCNAME[0]} getentry failed ($?): $1"
@@ -229,7 +226,7 @@ function reflow {
 			echo "${FUNCNAME[0]} getentry failed ($?): $1"
 			continue
 		}
-		newpath="$base/$result"
+		newpath="$BIBBASE/$result"
 		if [ ! "$d" -ef "$newpath" ]; then
 			mv "$d" "$newpath"
 			echo "Reflowed: $ent"
