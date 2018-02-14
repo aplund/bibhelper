@@ -380,7 +380,7 @@ function list {
 }
 
 function base {
-	getbase $PWD && echo $result
+	echo $BIBBASE
 }
 
 function open {
@@ -397,7 +397,7 @@ function open {
 
 verbs=("list" "bibgrep" "summary")
 verbs+=("printentry" "printpath")
-verbs+=("open")
+verbs+=("open" "base")
 #verbs+=("add" "addget" "getbib")
 #verbs+=("reflow" "base")
 
