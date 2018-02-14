@@ -372,8 +372,7 @@ function summary {
 }
 
 function list {
-	getbase
-	for i in "${result}"/**/.entry; do
+	for i in "$BIBBASE"/**/.entry; do
 		getentry "$i" && echo $result
 	done
 }
