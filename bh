@@ -102,7 +102,7 @@ function printentry {
 function getpath {
 	# String must contain a : to separate the prefix from suffix
 	if [[ "$1" != *":"* ]] ; then
-		return 2
+		return 1
 	fi
 
 	encodestring "${1#*:}"
