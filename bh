@@ -383,8 +383,21 @@ function base {
 	getbase $PWD && echo $result
 }
 
+function open {
+	for i in "$@"; do
+		getpath $i
+		document="$BIBBASE/$result/pdf"
+		if [ -f "$document" ]; then
+			xdg-open "$document" &
+		else
+			echo "$i: no pdf"
+		fi
+	done
+}
+
 verbs=("list" "bibgrep" "summary")
 verbs+=("printentry" "printpath")
+verbs+=("open")
 #verbs+=("add" "addget" "getbib")
 #verbs+=("reflow" "base")
 
