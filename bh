@@ -177,7 +177,12 @@ function printpath {
 			echo "${FUNCNAME[0]} Bad string ($?): $i"
 			continue
 		}
-		echo "$BIBBASE/$result"
+		fullpath="$BIBBASE/$result"
+		if [ -f "$fullpath/.entry" ]; then
+			echo "$fullpath"
+		else
+			echo "Not an entry: $fullpath"
+		fi
 	done
 }
 
