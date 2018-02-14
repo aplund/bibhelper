@@ -328,14 +328,25 @@ function summary {
 		echo $i
 		getpath $i
 		fullpath=$BIBBASE/$result
-		echo $fullpath
+		echo "Path: " $fullpath
 		if [ -f "$fullpath/bib" ]; then
 			sed -n '
-/[[:space:]]*title[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}
-/[[:space:]]*author[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}' \
-				"$BIBBASE/$result"/bib
+/[[:space:]]*title[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//Title: \1/; p}' \
+				"$fullpath/bib"
+			sed -n '
+/[[:space:]]*author[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//Author: \1/; p}' \
+				"$fullpath/bib"
+			sed -n '
+/[[:space:]]*url[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//URL: \1/; p}' \
+				"$fullpath/bib"
 		else
 			echo "No bibliographic information"
+		fi
+		echo -n "PDF file: "
+		if [ -f "$fullpath/pdf" ]; then
+			echo "yes"
+		else
+			echo "no"
 		fi
 		echo
 	done
