@@ -26,7 +26,7 @@ fi
 popd > /dev/null
 
 function isEntry {
-	[ -d "$1" ] && [ -f "$1/.entry" ]
+	[ -d "$1" ] && [ -f "$1/.entry" ] && [[ "$1" == "${BIBBASE}/"* ]]
 }
 
 
