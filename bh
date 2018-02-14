@@ -398,7 +398,16 @@ function init {
 	popd > /dev/null
 
 	touch .bibbase
-	mkdir arxiv doi isbn
+}
+
+function addprot {
+	location="$BIBBASE/$1"
+	if [ -d "$location" ]; then
+		echo "Protocol already added"
+		exit 1
+	fi
+
+	mkdir "$location"
 }
 
 verbs=("list" "bibgrep" "summary")
@@ -406,7 +415,7 @@ verbs+=("printentry" "printpath")
 verbs+=("open" "base")
 verbs+=("add")
 verbs+=("getbib")
-verbs+=("init")
+verbs+=("init" "addprot")
 #verbs+=("add" "addget" "getbib")
 #verbs+=("reflow" "base")
 
