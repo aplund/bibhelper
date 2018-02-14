@@ -108,10 +108,10 @@ function getpath {
 	encodestring "${1#*:}"
 	declare suffix="$result"
 	suffix="${suffix,,}" # to lowercase
-	result="${1%%:*}" # prefix
+	result="${1%%:*}" # Populate result with prefix
 	result="${result,,}" # to lowercase
 
-	# Root _must_ exist
+	# Root type _must_ exist
 	if [ ! -d "$BIBBASE/$result" ]; then
 		unset result
 		return 2
