@@ -358,11 +358,16 @@ function summary {
 	for i in "$@"; do
 		echo $i
 		getpath $i
-		echo $BIBBASE/$result
-		sed -n '
+		fullpath=$BIBBASE/$result
+		echo $fullpath
+		if [ -f "$fullpath/bib" ]; then
+			sed -n '
 /[[:space:]]*title[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}
 /[[:space:]]*author[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}' \
-			"$BIBBASE/$result"/bib
+				"$BIBBASE/$result"/bib
+		else
+			echo "No bibliographic information"
+		fi
 		echo
 	done
 }
