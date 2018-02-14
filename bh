@@ -3,12 +3,14 @@
 shopt -s globstar
 
 # Setup $BIBBASE
+function cdtobaseorroot {
+	while [ ! -f "$PWD"/.bibbase -a "$PWD" != "/" ] ; do
+		cd ..
+	done
+}
+
 pushd "$PWD" > /dev/null
-
-while [ ! -f "$PWD"/.bibbase -a "$PWD" != "/" ] ; do
-	cd ..
-done
-
+cdtobaseorroot
 if [[ "$PWD" == "/" ]]; then
 	if [ -f "/.bibbase" ]; then
 		BIBBASE="/"   # But seriously, don't do this.
@@ -22,7 +24,6 @@ if [[ "$PWD" == "/" ]]; then
 else
 	BIBBASE="$PWD"
 fi
-
 popd > /dev/null
 
 function isEntry {
@@ -383,11 +384,29 @@ function open {
 	done
 }
 
+function init {
+	pushd $PWD > /dev/null
+	cdtobaseorroot
+
+	if [[ "$PWD" != "/" ]] || [ -f "/.bibbase" ]; then
+		echo "Already a database."
+	        echo "Nested databases currently not permitted."
+		popd > /dev/null
+		exit 1
+	fi
+
+	popd > /dev/null
+
+	touch .bibbase
+	mkdir arxiv doi isbn
+}
+
 verbs=("list" "bibgrep" "summary")
 verbs+=("printentry" "printpath")
 verbs+=("open" "base")
 verbs+=("add")
 verbs+=("getbib")
+verbs+=("init")
 #verbs+=("add" "addget" "getbib")
 #verbs+=("reflow" "base")
 
