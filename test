@@ -6,7 +6,7 @@ testdir="/tmp/bh-test-$(date -u +"%F.%T")-$RANDOM"
 
 failcount=0
 failtest () {
-	echo "FAILURE:" $1
+	echo "FAILURE ($?):" $1
 	failcount=$(($failcount + 1))
 }
 
@@ -16,10 +16,22 @@ cd "$testdir"
 $bh init
 
 # Non-existant repo tests
-if "$bh" add junk:junk ; then failtest "Add junk test failed" ; fi
-if [ -d junk ] ; then failtest "Junk repo folder added" ; fi
-if [ -d junk/junk ] ; then failtest "Junk entry folder added" ; fi
-if [ -f junk/junk/.bibentry ] ; then printf "Junk entry file added" ; fi
+"$bh" add junk:junk
+if [ -d junk ]  ; then failtest "Add junk protocol should fail here" ; fi
+
+"$bh" addprot junk
+if [ ! -d junk ]  ; then failtest "Adding junk protocol failed"; fi
+
+"$bh" add junk:junk
+if [ ! -d junk/junk ] ; then failtest "Junk entry folder added" ; fi
+if [ ! -f junk/junk/.entry ] ; then failtest "Junk entry file added" ; fi
+
+echo "Adding standrd protocols"
+protocols=(arxiv doi isbn)
+bh addprot "${protocols[@]}"
+for i in "${protocols[@]}"; do
+	if [ ! -d "$i" ]; then failtest "Couldn't add $i protocol"; fi
+done
 
 echo "Adding entries:"
 time cat $li | xargs $bh add
