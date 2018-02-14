@@ -147,7 +147,7 @@ function printpath {
 			continue
 		}
 		fullpath="$BIBBASE/$result"
-		if [ -f "$fullpath/.entry" ]; then
+		if isEntry "$fullpath"; then
 			echo "$fullpath"
 		else
 			echo "Not an entry: $fullpath"
