@@ -402,12 +402,16 @@ function init {
 
 function addprot {
 	location="$BIBBASE/$1"
-	if [ -d "$location" ]; then
-		echo "Protocol already added"
-		exit 1
-	fi
+	local -a addprots
+	for i in "$@"; do
+		if [ -d "$i" ]; then
+			echo "Protocol $i already added. Skipping."
+			continue
+		fi
+		addprots+=("$i")
+	done
 
-	mkdir "$location"
+	mkdir "${addprots[@]}"
 }
 
 verbs=("list" "bibgrep" "summary")
