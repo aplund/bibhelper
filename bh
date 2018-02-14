@@ -352,14 +352,14 @@ function bibgrep {
 }
 
 function summary {
-	entriesorpwd "$@"
-	for i in "${ENTRIES[@]}"; do
+	for i in "$@"; do
+		echo $i
 		getpath $i
+		echo $BIBBASE/$result
 		sed -n '
-/[[:space:]]*doi[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//doi:\1/; p}
-/[[:space:]]*isbn[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//isbn:\1/; p}
 /[[:space:]]*title[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}
-/[[:space:]]*author[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}' "$base/$result"/bib
+/[[:space:]]*author[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//\1/; p}' \
+			"$BIBBASE/$result"/bib
 		echo
 	done
 }
@@ -375,10 +375,9 @@ function base {
 	getbase $PWD && echo $result
 }
 
-verbs=("list" "bibgrep")
-#verbs+=("summary" "bibgrep")
+verbs=("list" "bibgrep" "summary")
+verbs+=("printentry" "printpath")
 #verbs+=("add" "addget" "getbib")
-#verbs+=("printentry" "printpath")
 #verbs+=("reflow" "base")
 
 func="$1"
