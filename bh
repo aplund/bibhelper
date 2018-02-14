@@ -99,12 +99,11 @@ function entriesorpwd {
 function getentry {
 	declare testpath=${1%.entry}
 	isEntry "$testpath" || return 1
-	getbase "$testpath" || return 2
 
 	declare -a array
 	
 	pushd "$testpath" > /dev/null
-	while [ "$PWD" != "$result" ]; do
+	while [ "$PWD" != "$BIBBASE" ]; do
 		array=("${PWD##*/}" "${array[@]}" )
 		cd ..
 	done
