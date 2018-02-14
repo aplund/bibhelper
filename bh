@@ -2,36 +2,6 @@
 
 shopt -s globstar
 
-function getbase {
-	declare testpath
-	if [ ! -v "1" ]; then
-		testpath="$PWD"
-	elif [ ! -d "$1" ]; then
-		testpath=$(dirname "$1")
-	else
-		testpath="$1"
-	fi
-
-	pushd "$testpath" > /dev/null
-
-	while [ ! -f ".bibbase" ]; do
-		if [ "$PWD" == "/" ]; then
-			if [ -z "$BIBBASE" ] &&
-				[ ! -f "${BIBBASE}/.bibbase"]; then
-				return 1
-			else
-				result="$BIBBASE"
-				popd > /dev/null
-				return 0
-			fi
-		fi
-		cd ..
-	done
-
-	result="$PWD"
-	popd > /dev/null
-}
-
 # Setup $BIBBASE
 pushd "$PWD" > /dev/null
 
