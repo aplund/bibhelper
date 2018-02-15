@@ -234,7 +234,7 @@ function getbib_doi {
 		files+=("$loc/bib")
 		args+=("${doi/doi:/http://doi.org/}")
 	done
-	curl "${args[@]}" || return 1
+	curl "${args[@]}" || return $?
 
 	# Post-process
 	tmpfile="$(mktemp)"
