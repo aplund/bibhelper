@@ -331,8 +331,8 @@ function addget {
 }
 
 function bibgrep {
-	ents=$(printf '%s\0' "$BIBBASE"/**/bib | xargs -0 grep -l "$@" | xargs dirname)
-	printentry $ents
+	mapfile -t ents < <(grep -l "$@" "$BIBBASE"/**/bib)
+	printentry "${ents[@]%%/bib}"
 }
 
 function summary {
