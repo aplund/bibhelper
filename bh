@@ -279,6 +279,7 @@ function getbib {
 	local -a isbn
 	local -a arxiv
 	local -a rest
+	pushd $BIBBASE > /dev/null
 	for i in "$@"; do
 		getpath $i || {
 			echo "Bad entry: $i Skipping."
@@ -318,6 +319,7 @@ function getbib {
 	#echo "${arxiv[@]}"
 	#echo ===REST===
 	#echo "${rest[@]}"
+	popd > /dev/null
 }
 
 #not working?
