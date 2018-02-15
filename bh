@@ -441,7 +441,7 @@ verbs+=("reflow")
 func="$1"
 shift
 if [ -z "$func" ]; then
-	echo "Base directory: " "$BIBBASE"
+	echo "Base directory:" "$BIBBASE"
 	declare -a paths=("$BIBBASE"/**/.entry)
 	echo "Number of entries:" "${#paths[*]}"
 	echo "Known verbs:" "${verbs[@]}"
