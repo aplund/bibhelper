@@ -2,6 +2,11 @@
 
 bh="$PWD/bh"
 li="$PWD/list"
+lisum="386e39227c6b63be891501bc1700b048170fe52834caede5010fc06f085603d7"
+if [[ $(sha256sum "$li" | cut -d " " -f 1) != $lisum ]]; then
+	echo "Test data checksum doesn't match."
+	echo "Expect failures."
+fi
 testdir="/tmp/bh-test-$(date -u +"%F.%T")-$RANDOM"
 
 failcount=0
@@ -14,6 +19,7 @@ mkdir "$testdir"
 cd "$testdir"
 
 $bh init
+if [ ! -f .bibbase ]; then failtest "Initing bibbase failed"; fi
 
 # Non-existant repo tests
 "$bh" add junk:junk
@@ -26,6 +32,9 @@ if [ ! -d junk ]  ; then failtest "Adding junk protocol failed"; fi
 if [ ! -d junk/junk ] ; then failtest "Junk entry folder added" ; fi
 if [ ! -f junk/junk/.entry ] ; then failtest "Junk entry file added" ; fi
 
+# Removals are manual
+rm -rf junk
+
 echo "Adding standrd protocols"
 protocols=(arxiv doi isbn)
 bh addprot "${protocols[@]}"
@@ -34,19 +43,30 @@ for i in "${protocols[@]}"; do
 done
 
 echo "Adding entries:"
-time cat $li | xargs $bh add
+time cat $li | xargs $bh add  2>&1
 echo "Return: " $?
 tree -a
+echo "179 directories expected"
 
 # Reflow tests
-mkdir doi/$($bh enc 10.1103/)
-mkdir doi/$($bh enc 10.1103/)/$($bh enc physreva.)
+# Reflowing is currently done _manually_
+mkdir doi/10.1103_x2f
+mkdir doi/10.1103_x2f/physreva.
 
 echo "Reflowing entries"
 time find . -name .entry -printf %h\\0 | xargs -0 $bh reflow
 echo "Return: " $?
 
+if [ ! -f "doi/10.1103_x2f/physrevlett.100.030503/.entry" ]; then 
+	failtest "Single nested reflow failed"
+fi
+
+if [ ! -f "doi/10.1103_x2f/physreva./41.5139/.entry" ]; then 
+	failtest "Double nested reflow failed"
+fi
+
 tree -a
+echo "181 directories expected"
 
 rm -rf "$testdir"
 
