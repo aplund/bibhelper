@@ -360,8 +360,8 @@ function summary {
 		echo "Path:" $fullpath
 		if [ -f "$fullpath/bib" ]; then
 			awk -F "=" '
-			/author/ {print "Author:", gensub(/.*{(.*)}.*/, "\\1", "1", $2)}
-			/title/ {print "Title:", gensub(/.*{(.*)}.*/, "\\1", "1", $2)}
+			/author/ {print "Author:", gensub(/[[:space:]]*{(.*)}.*/, "\\1", "1", $2)}
+			/title/ {print "Title:", gensub(/[[:space:]]*{(.*)}.*/, "\\1", "1", $2)}
 			' "$fullpath/bib" | detex
 			 awk -F '=' '/url/ { print "URL:", gensub(/.*{(.*)}.*/, "\\1", "1",  $2) }' "$fullpath/bib"
 		else
