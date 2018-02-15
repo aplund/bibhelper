@@ -337,20 +337,19 @@ function bibgrep {
 
 function summary {
 	for i in "$@"; do
+		getpath $i || {
+			echo "$i: Not an entry ($?)"
+			continue
+		}
 		echo $i
-		getpath $i
 		fullpath=$BIBBASE/$result
-		echo "Path: " $fullpath
+		echo "Path:" $fullpath
 		if [ -f "$fullpath/bib" ]; then
-			sed -n '
-/[[:space:]]*title[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//Title: \1/; p}' \
-				"$fullpath/bib"
-			sed -n '
-/[[:space:]]*author[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//Author: \1/; p}' \
-				"$fullpath/bib"
-			sed -n '
-/[[:space:]]*url[[:space:]]*=[[:space:]]*{\(.*\)}.*/{s//URL: \1/; p}' \
-				"$fullpath/bib"
+			awk -F "=" '
+			/author/ {print "Author:", gensub(/.*{(.*)}.*/, "\\1", "1", $2)}
+			/title/ {print "Title:", gensub(/.*{(.*)}.*/, "\\1", "1", $2)}
+			' "$fullpath/bib" | detex
+			 awk -F '=' '/url/ { print "URL:", gensub(/.*{(.*)}.*/, "\\1", "1",  $2) }' "$fullpath/bib"
 		else
 			echo "No bibliographic information"
 		fi
