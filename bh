@@ -420,6 +420,7 @@ verbs+=("open" "base")
 verbs+=("add")
 verbs+=("getbib")
 verbs+=("init" "addprot")
+verbs+=("reflow")
 #verbs+=("add" "addget" "getbib")
 #verbs+=("reflow" "base")
 
