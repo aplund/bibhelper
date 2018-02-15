@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 bh="$PWD/bh"
 li="$PWD/list"
@@ -43,10 +43,13 @@ for i in "${protocols[@]}"; do
 done
 
 echo "Adding entries:"
-time cat $li | xargs $bh add  2>&1
+time cat $li | xargs $bh add
 echo "Return: " $?
 tree -a
 echo "179 directories expected"
+echo "Misplaced entries:"
+comm -3 <($bh list | sort) <(cat "$li" | tr "[:upper:]" "[:lower:]" | sort)
+
 
 # Reflow tests
 # Reflowing is currently done _manually_
@@ -57,16 +60,41 @@ echo "Reflowing entries"
 time find . -name .entry -printf %h\\0 | xargs -0 $bh reflow
 echo "Return: " $?
 
-if [ ! -f "doi/10.1103_x2f/physrevlett.100.030503/.entry" ]; then 
+if [ ! -f "doi/10.1103_x2f/physrevlett.100.030503/.entry" ]; then
 	failtest "Single nested reflow failed"
 fi
 
-if [ ! -f "doi/10.1103_x2f/physreva./41.5139/.entry" ]; then 
+if [ ! -f "doi/10.1103_x2f/physreva./41.5139/.entry" ]; then
 	failtest "Double nested reflow failed"
 fi
 
 tree -a
 echo "181 directories expected"
+
+echo "Misplaced entries:"
+comm -3 <($bh list | sort) <(cat "$li" | tr "[:upper:]" "[:lower:]" | sort)
+
+gettertest="(\
+physrevlett\\.100\\.030503|\
+physreva\\.41\\.5139|\
+science\\.273\\.5278\\.1073\
+)"
+echo $gettertest
+getterfiles=(\
+	"doi/10.1103_x2f/physreva./41.5139/bib"
+	"doi/10.1103_x2f/physrevlett.100.030503/bib"
+	"doi/10.1126_x2fscience.273.5278.1073/bib"
+	)
+xargs -a <(egrep "$gettertest" $li) "$bh" getbib
+for f in "${getterfiles[@]}"; do
+	if [ ! -f "$f" ]; then
+		failtest "doi getter failed: $f"
+	else
+		echo "$f"
+		cat "$f"
+		echo
+	fi
+done
 
 rm -rf "$testdir"
 
