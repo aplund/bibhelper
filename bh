@@ -399,6 +399,22 @@ function open {
 	done
 }
 
+function notes {
+	if [ -z $EDITOR ]; then
+		echo "No \$EDITOR set.  Mayabe use pen and paper?"
+		exit 1
+	fi
+	local -a paths
+	for i in "$@"; do
+		getpath $i || {
+			echo "Skipping bad entry $i"
+			continue
+		}
+		paths+=("$BIBBASE/$result/notes")
+	done
+	$EDITOR "${paths[@]}"
+}
+
 function init {
 	pushd $PWD > /dev/null
 	cdtobaseorroot
@@ -431,7 +447,7 @@ function addprot {
 
 verbs=("list" "bibgrep" "summary")
 verbs+=("printentry" "printpath")
-verbs+=("open" "base")
+verbs+=("open" "base", "notes")
 verbs+=("add")
 verbs+=("getbib")
 verbs+=("init" "addprot")
