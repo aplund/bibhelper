@@ -1,6 +1,7 @@
 #!/bin/bash
 
 shopt -s globstar
+shopt -s nullglob
 
 # Setup $BIBBASE
 function cdtobaseorroot {
@@ -330,9 +331,22 @@ function addget {
 	getbib "${added[@]}"
 }
 
+function updatecache {
+	bibentries=($BIBBASE/**/bib)
+	for e in "${bibentries[@]%/bib}"; do
+		dt="$e/.cache.bib.detex"
+		if [ ! -f "$dt" ] || [ "$dt" -ot "$e/bib" ]; then
+			getentry "$e"
+			echo Updating detex cache for $result
+			detex "$e/bib" > "$dt" #Check for signal races here
+		fi
+	done
+}
+
 function bibgrep {
-	mapfile -t ents < <(grep -l "$@" "$BIBBASE"/**/bib)
-	printentry "${ents[@]%%/bib}"
+	updatecache
+	mapfile -t ents < <(grep -l "$@" "$BIBBASE"/**/bib "$BIBBASE"/**/.cache.bib.detex | sed 's/bib$//;;s/\.cache\.bib\.detex$//' )
+	printentry "${ents[@]}" | sort | uniq
 }
 
 function summary {
