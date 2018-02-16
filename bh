@@ -415,6 +415,32 @@ function notes {
 	$EDITOR "${paths[@]}"
 }
 
+function pdfset {
+	local ent
+	local pdf
+	while
+		ent="$1"
+		shift
+		pdf="$1"
+		shift
+	do
+		getpath "$ent" || {
+			echo "Not an entry $ent. Skipping."
+			continue
+		}
+		[ ! -f "$BIBBASE/$result/pdf" ] || {
+			echo "PDF already present. Skipping"
+			continue
+		}
+		[ -f "$pdf" ] || {
+			echo "$pdf not a file. Skipping."
+			continue
+		}
+		cp "$pdf" "$BIBBASE/$result/pdf"
+	done
+}
+
+
 function init {
 	pushd $PWD > /dev/null
 	cdtobaseorroot
@@ -452,6 +478,7 @@ verbs+=("add")
 verbs+=("getbib")
 verbs+=("init" "addprot")
 verbs+=("reflow")
+verbs+=("pdfset")
 #verbs+=("addget")
 
 func="$1"
