@@ -462,7 +462,7 @@ if [ -z "$func" ]; then
 	echo "Number of entries:" "${#paths[*]}"
 	echo "Known verbs:" "${verbs[@]}"
 	exit 1
-elif [[ "${verbs[*]}" == *"${func}"* ]]; then
+elif [[ " ${verbs[@]} " == *" ${func} "* ]]; then
 	"$func" "$@"
 else
 	echo "Unknown verb: $func"
