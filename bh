@@ -383,6 +383,22 @@ function list {
 	done
 }
 
+function bib {
+	for i in "$@"; do
+		getpath $i || {
+			echo "% Not an entry $i"
+			continue
+		}
+		bibfile="$BIBBASE/$result/bib"
+		[ -f "$bibfile" ] || {
+			echo "% No bib file $i"
+			continue
+		}
+		cat $bibfile
+		echo
+	done
+}
+
 function base {
 	echo $BIBBASE
 }
@@ -471,7 +487,7 @@ function addprot {
 	mkdir "${addprots[@]}"
 }
 
-verbs=("list" "bibgrep" "summary")
+verbs=("list" "bibgrep" "summary", "bib")
 verbs+=("printentry" "printpath")
 verbs+=("open" "base" "notes")
 verbs+=("add")
