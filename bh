@@ -473,7 +473,7 @@ function addprot {
 
 verbs=("list" "bibgrep" "summary")
 verbs+=("printentry" "printpath")
-verbs+=("open" "base", "notes")
+verbs+=("open" "base" "notes")
 verbs+=("add")
 verbs+=("getbib")
 verbs+=("init" "addprot")
