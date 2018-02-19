@@ -488,7 +488,7 @@ function addprot {
 	mkdir "${addprots[@]}"
 }
 
-verbs=("list" "bibgrep" "summary", "bib")
+verbs=("list" "bibgrep" "summary" "bib")
 verbs+=("printentry" "printpath")
 verbs+=("open" "base" "notes")
 verbs+=("add")
