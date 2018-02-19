@@ -164,7 +164,7 @@ function enc {
 
 # returns $result array of successfully added entries
 function add {
-	local -a addedpaths=()
+	local -a added=()
 	local i
 	while
 		i="$1"
@@ -185,9 +185,9 @@ function add {
 		else
 			echo "Failed to add $i"
 		fi
-		addedpaths+=("$d")
+		added+=("$i")
 	done
-	result=("${addedpaths[@]}")
+	result="${added[@]}"
 }
 
 function reflow {
@@ -327,12 +327,9 @@ function getbib {
 	popd > /dev/null
 }
 
-#not working?
 function addget {
 	add "$@" #returns $result array
-	added=("${result[@]}")
-	echo "${added[@]}"
-	getbib "${added[@]}"
+	[ -n "${result[@]}" ] && getbib "${result[@]}"
 }
 
 function updatecache {
@@ -499,7 +496,7 @@ verbs+=("getbib")
 verbs+=("init" "addprot")
 verbs+=("reflow")
 verbs+=("pdfset")
-#verbs+=("addget")
+verbs+=("addget")
 
 func="$1"
 shift
