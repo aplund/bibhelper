@@ -180,7 +180,11 @@ function add {
 			continue
 		}
 		mkdir -p "$d"
-		touch "$d/.entry"
+		if touch "$d/.entry"; then
+			echo "Added $i"
+		else
+			echo "Failed to add $i"
+		fi
 		addedpaths+=("$d")
 	done
 	result=("${addedpaths[@]}")
