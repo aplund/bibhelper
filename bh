@@ -400,10 +400,6 @@ function bib {
 	done
 }
 
-function base {
-	echo $BIBBASE
-}
-
 function open {
 	for i in "$@"; do
 		getpath $i
@@ -488,15 +484,16 @@ function addprot {
 	mkdir "${addprots[@]}"
 }
 
-verbs=("list" "bibgrep" "summary" "bib")
+# Startup
+verbs=("init" "addprot")
+# Build data
+verbs+=("add" "getbib" "addget" "pdfset")
+# Show data
+verbs+=("list" "bibgrep" "summary")
+verbs+=("open" "notes" "bib")
+# Legacy, should go away at some point
 verbs+=("printentry" "printpath")
-verbs+=("open" "base" "notes")
-verbs+=("add")
-verbs+=("getbib")
-verbs+=("init" "addprot")
 verbs+=("reflow")
-verbs+=("pdfset")
-verbs+=("addget")
 
 func="$1"
 shift
