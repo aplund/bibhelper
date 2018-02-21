@@ -241,33 +241,33 @@ function getbib_doi {
 }
 
 #need changing to new interface
-function getbib_isbn {
-	if [ "$#" -eq "0" ]; then
-		return
-	fi
-	declare -a args
-	args+=("-L" "-s")
-	args+=("-A" "$agent")
-	for i in "$@"; do
-		#echo $i
-		getentry "$i" || {
-			echo "Bad entry: $p Skipping"
-		       	continue
-		}
-		args+=("http://www.ottobib.com/${result/isbn:/isbn/}/bibtex")
-		echo -n "Fetching $result... "
-		var=$(curl "${args[@]}")
-		if [ -z $var ]; then
-			echo "Failed, no entry returned."
-			continue
-		else
-			echo "Done."
-		fi
-		var1="@Book${var##*@Book}"
-		echo ${var1%%</textarea>*} > "$i/bib"
-	done
-
-}
+#function getbib_isbn {
+#	if [ "$#" -eq "0" ]; then
+#		return
+#	fi
+#	declare -a args
+#	args+=("-L" "-s")
+#	args+=("-A" "$agent")
+#	for i in "$@"; do
+#		#echo $i
+#		getentry "$i" || {
+#			echo "Bad entry: $p Skipping"
+#		       	continue
+#		}
+#		args+=("http://www.ottobib.com/${result/isbn:/isbn/}/bibtex")
+#		echo -n "Fetching $result... "
+#		var=$(curl "${args[@]}")
+#		if [ -z $var ]; then
+#			echo "Failed, no entry returned."
+#			continue
+#		else
+#			echo "Done."
+#		fi
+#		var1="@Book${var##*@Book}"
+#		echo ${var1%%</textarea>*} > "$i/bib"
+#	done
+#
+#}
 
 function getbib {
 	local -a doi
