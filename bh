@@ -338,7 +338,7 @@ function updatecache {
 		dt="$e/.cache.bib.detex"
 		if [ ! -f "$dt" ] || [ "$dt" -ot "$e/bib" ]; then
 			getentry "$e"
-			echo Updating detex cache for $result
+			echo Updating detex cache for $result >&2
 			detex "$e/bib" > "$dt" #Check for signal races here
 		fi
 	done
