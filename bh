@@ -16,10 +16,10 @@ if [[ "$PWD" == "/" ]]; then
 	if [ -f "/.bibbase" ]; then
 		BIBBASE="/"   # But seriously, don't do this.
 	elif [ -z "$BIBBASE" ]; then
-		echo "\$BIBBASE unset and no database in path"
+		echo "\$BIBBASE unset and no database in path" >&2
 		exit 1
 	elif [ ! -f "${BIBBASE}/.bibbase" ]; then
-		echo "$BIBBASE is not a database"
+		echo "$BIBBASE is not a database" >&2
 		exit 1
 	fi
 else
@@ -142,7 +142,7 @@ function printpath {
 		if isEntry "$fullpath"; then
 			echo "$fullpath"
 		else
-			echo "Not an entry: $fullpath"
+			echo "Not an entry: $fullpath" >&2
 		fi
 	done
 }
@@ -163,7 +163,7 @@ function add {
 		getpath "$i" || continue
 		d="$BIBBASE/$result"
 		[ -d "$d" ] && {
-			echo "${FUNCNAME[0]} Entry exists: $d. Skipping."
+			echo "${FUNCNAME[0]} Entry exists: $d. Skipping." >&2
 			continue
 		}
 		mkdir -p "$d"
@@ -181,7 +181,7 @@ function reflow {
 	for i in "$BIBBASE"/**/.entry; do
 		d="${i%.entry}"
 		getentry "$d" || {
-			echo "${FUNCNAME[0]} getentry failed ($?): $1"
+			echo "${FUNCNAME[0]} getentry failed ($?): $1" >&2
 			continue
 		}
 		ent="$result"
@@ -215,7 +215,7 @@ function getbib_doi {
 	do
 		echo $doi $loc
 		if [ ! -d $loc ]; then
-			echo "Bad path: $loc Skippping."
+			echo "Bad path: $loc Skippping." >&2
 			continue
 		fi
 		args+=("-o" "$loc/bib")
@@ -272,11 +272,11 @@ function getbib {
 		getpath $i || continue
 		p=$result
 		isEntry "$BIBBASE/$p" || {
-			echo "Not entry: $p Skipping."
+			echo "Not entry: $p Skipping." >&2
 		       	continue
 		}
 		[ ! -e "$BIBBASE/$p/bib" ] || {
-			echo "Bib exists: $p/bib Skipping"
+			echo "Bib exists: $p/bib Skipping" >&2
 		       	continue
 		}
 		case "$i" in
@@ -366,7 +366,7 @@ function bib {
 		getpath $i || continue
 		bibfile="$BIBBASE/$result/bib"
 		[ -f "$bibfile" ] || {
-			echo "% No bib file $i"
+			echo "% No bib file $i" >&2
 			continue
 		}
 		cat $bibfile
@@ -381,14 +381,14 @@ function open {
 		if [ -f "$document" ]; then
 			xdg-open "$document" &
 		else
-			echo "$i: no pdf"
+			echo "$i: no pdf" >&2
 		fi
 	done
 }
 
 function notes {
 	if [ -z $EDITOR ]; then
-		echo "No \$EDITOR set.  Mayabe use pen and paper?"
+		echo "No \$EDITOR set.  Mayabe use pen and paper?" >&2
 		exit 1
 	fi
 	local -a paths
@@ -410,11 +410,11 @@ function pdfset {
 	do
 		getpath "$ent" || continue
 		[ ! -f "$BIBBASE/$result/pdf" ] || {
-			echo "PDF already present. Skipping"
+			echo "PDF already present. Skipping" >&2
 			continue
 		}
 		[ -f "$pdf" ] || {
-			echo "$pdf not a file. Skipping."
+			echo "$pdf not a file. Skipping." >&2
 			continue
 		}
 		cp "$pdf" "$BIBBASE/$result/pdf"
@@ -427,8 +427,8 @@ function init {
 	cdtobaseorroot
 
 	if [[ "$PWD" != "/" ]] || [ -f "/.bibbase" ]; then
-		echo "Already a database."
-	        echo "Nested databases currently not permitted."
+		echo "Already a database." >&2
+	        echo "Nested databases currently not permitted." >&2
 		popd > /dev/null
 		exit 1
 	fi
@@ -443,7 +443,7 @@ function addprot {
 	local -a addprots
 	for i in "$@"; do
 		if [ -d "$i" ]; then
-			echo "Protocol $i already added. Skipping."
+			echo "Protocol $i already added. Skipping." >&2
 			continue
 		fi
 		addprots+=("$i")
