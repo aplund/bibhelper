@@ -137,10 +137,7 @@ function printpath {
 		i="$1"
 		shift
 	do
-		getpath "$i" || {
-			echo "${FUNCNAME[0]} Bad string ($?): $i"
-			continue
-		}
+		getpath "$i" || continue
 		fullpath="$BIBBASE/$result"
 		if isEntry "$fullpath"; then
 			echo "$fullpath"
@@ -163,10 +160,7 @@ function add {
 		i="$1"
 		shift
 	do
-		getpath "$i" || {
-			echo "${FUNCNAME[0]} Bad string ($?): $i. Skipping."
-			continue
-		}
+		getpath "$i" || continue
 		d="$BIBBASE/$result"
 		[ -d "$d" ] && {
 			echo "${FUNCNAME[0]} Entry exists: $d. Skipping."
@@ -191,10 +185,7 @@ function reflow {
 			continue
 		}
 		ent="$result"
-		getpath "$result" || {
-			echo "${FUNCNAME[0]} getentry failed ($?): $1"
-			continue
-		}
+		getpath "$result" || continue
 		newpath="$BIBBASE/$result"
 		if [ ! "$d" -ef "$newpath" ]; then
 			mv "$d" "$newpath"
@@ -278,10 +269,7 @@ function getbib {
 	local -a rest
 	pushd $BIBBASE > /dev/null
 	for i in "$@"; do
-		getpath $i || {
-			echo "Bad entry: $i Skipping."
-			continue
-		}
+		getpath $i || continue
 		p=$result
 		isEntry "$BIBBASE/$p" || {
 			echo "Not entry: $p Skipping."
@@ -344,10 +332,7 @@ function bibgrep {
 
 function summary {
 	for i in "$@"; do
-		getpath $i || {
-			echo "$i: Not an entry ($?)"
-			continue
-		}
+		getpath $i || continue
 		echo $i
 		fullpath=$BIBBASE/$result
 		echo "Path:" $fullpath
@@ -378,10 +363,7 @@ function list {
 
 function bib {
 	for i in "$@"; do
-		getpath $i || {
-			echo "% Not an entry $i"
-			continue
-		}
+		getpath $i || continue
 		bibfile="$BIBBASE/$result/bib"
 		[ -f "$bibfile" ] || {
 			echo "% No bib file $i"
@@ -394,7 +376,7 @@ function bib {
 
 function open {
 	for i in "$@"; do
-		getpath $i
+		getpath $i || continue
 		document="$BIBBASE/$result/pdf"
 		if [ -f "$document" ]; then
 			xdg-open "$document" &
@@ -411,10 +393,7 @@ function notes {
 	fi
 	local -a paths
 	for i in "$@"; do
-		getpath $i || {
-			echo "Skipping bad entry $i"
-			continue
-		}
+		getpath $i || continue
 		paths+=("$BIBBASE/$result/notes")
 	done
 	$EDITOR "${paths[@]}"
@@ -429,10 +408,7 @@ function pdfset {
 		pdf="$1"
 		shift
 	do
-		getpath "$ent" || {
-			echo "Not an entry $ent. Skipping."
-			continue
-		}
+		getpath "$ent" || continue
 		[ ! -f "$BIBBASE/$result/pdf" ] || {
 			echo "PDF already present. Skipping"
 			continue
