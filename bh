@@ -87,12 +87,15 @@ function printentry {
 }
 
 #convert string to path
-#special handling of "." and ".."  They are disallowed as divisions!
+#This function walks the protocol tree to look for subdivisions.
+#However, it does not check if final entry exists.  Caller must check.
+#Special handling of "." and ".." as they are disallowed as divisions.
 #returned variables:
-#	$result: path relative to $BIBBASE
+#	$result: path relative to $BIBBASE.  Caller must prepend $BIBBASE.
 function getpath {
 	# String must contain a : to separate the prefix from suffix
 	if [[ "$1" != *":"* ]] ; then
+		echo "No protocol prefix: $1" >&2
 		return 1
 	fi
 
@@ -104,6 +107,7 @@ function getpath {
 
 	# Root type _must_ exist
 	if [ ! -d "$BIBBASE/$result" ]; then
+		echo "Protocol directory doesn't not exist: $result" >&2
 		unset result
 		return 2
 	fi
@@ -111,7 +115,6 @@ function getpath {
 	declare st=0 j=0 t
 	
 	pushd $BIBBASE > /dev/null
-	#for (( j=1, st=0 ; j <= ${#suffix} ; j=j+1 )); do
 	while [ $j -le ${#suffix} ]; do
 		j=$((j+1))
 		app="${suffix:$st:$j-$st}"
