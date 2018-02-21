@@ -46,12 +46,10 @@ function encodestring {
 	result="${result//\\/_x5c}"
 	result="${result//\//_x2f}"
 	result="${result//%/_x25}"
-#	result="${result//./_x2e}"
 }
 
 function decodestring {
 	result="$1"
-#	result="${result//_x2e/.}"
 	result="${result//_x25/%}"
 	result="${result//_x2f/\/}"
 	result="${result//_x5f/_}"
