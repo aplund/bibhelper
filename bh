@@ -58,16 +58,6 @@ function decodestring {
 	result="${result//_x5c/\\}"
 }
 
-declare -a ENTRIES
-function entriesorpwd {
-	if [ "$#" -eq 0 ]
-	then
-		ENTRIES[0]=$PWD
-	else
-		ENTRIES=("$@")
-	fi
-}
-
 function getentry {
 	declare testpath=${1%.entry}
 	isEntry "$testpath" || return 1
