@@ -324,8 +324,17 @@ function updatecache {
 
 function bibgrep {
 	updatecache
-	mapfile -t ents < <(grep -l "$@" "$BIBBASE"/**/bib "$BIBBASE"/**/.cache.bib.detex | sed 's/bib$//;;s/\.cache\.bib\.detex$//' )
-	printentry "${ents[@]}" | sort | uniq
+	files=("$BIBBASE"/**/{bib,.cache.bib.detex})
+	mapfile -t ents < <(grep -l "$@" "${files[@]}" )
+	ents=("${ents[@]%.cache.bib.detex}")
+	ents=("${ents[@]%bib}")
+	for i in "${ents[@]}"; do
+		getentry $i || {
+			echo "Not an entry $i" >&2
+			continue
+		}
+		echo $result
+	done | sort -u
 }
 
 function summary {
