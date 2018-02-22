@@ -73,17 +73,6 @@ function getentry {
 	decodestring "$rawstring"
 }
 
-function printentry {
-	for i in "$@"
-	do	
-		if getentry "$i"; then
-			echo "$result"	
-		else
-			echo "Not an entry"
-		fi
-	done
-}
-
 #convert string to path
 #This function walks the protocol tree to look for subdivisions.
 #However, it does not check if final entry exists.  Caller must check.
@@ -467,7 +456,7 @@ verbs+=("add" "getbib" "addget" "pdfset")
 verbs+=("list" "bibgrep" "summary")
 verbs+=("open" "notes" "bib")
 # Legacy, should go away at some point
-verbs+=("printentry" "printpath")
+verbs+=("printpath")
 verbs+=("reflow")
 
 func="$1"
