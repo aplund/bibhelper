@@ -419,7 +419,6 @@ function init {
 }
 
 function addprot {
-	location="$BIBBASE/$1"
 	local -a addprots
 	for i in "$@"; do
 		if [ -d "$i" ]; then
