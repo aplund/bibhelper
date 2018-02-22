@@ -354,7 +354,22 @@ function summary {
 }
 
 function list {
-	for i in "$BIBBASE"/**/.entry; do
+	entries=("$BIBBASE"/**/.entry)
+	if [[ "$1" == "-c" ]]; then
+		entries=($(ls -c "$BIBBASE"/**/.entry))
+#Totally not working.  shell things don't seem to work here.
+#find $BIBBASE -type f -not -wholename '*/.*' -printf '%T@ %p\0' | sort -zn | while read -rd '' _ path; do echo "${path%/*}"; done
+#	elif [[ "$1" == "-u" ]]; then
+#		entries=("$BIBBASE"/**/.entry)
+#		entries=("${entries[@]%.entry}")
+#		echo "${entries[@]/%/*}"
+#		$(ls -u "${entries[@]}")
+#		echo "${entries[@]}"
+	elif [ -n "$1" ]; then
+		echo Unknown argument $1 >&2
+		exit 1
+	fi
+	for i in "${entries[@]}"; do
 		getentry "$i" && echo $result
 	done
 }
