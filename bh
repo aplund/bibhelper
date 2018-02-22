@@ -28,9 +28,27 @@ fi
 popd > /dev/null
 
 function isEntry {
-	[ -d "$1" ] && [ -f "$1/.entry" ] && [[ "$1" == "${BIBBASE}/"* ]]
+	local quiet=""
+	if [[ $1 == "-q" ]]; then
+		quiet="Y"
+		shift
+	fi
+	if [ -z "$1" ]; then
+		[ -z "$quiet" ] && echo "${FUNCNAME[0]}: No argument given" >&2
+		return 64
+	elif [ ! -d "$1" ]; then
+		[ -z "$quiet" ] && echo "$1 is not a directory" >&2
+		return 1
+	elif [ ! -f "$1/.entry" ]; then
+		[ -z "$quiet" ] && echo "$1 has no .entry file" >&2
+		return 2
+	elif [[ "$1" != "${BIBBASE}/"* ]]; then
+		[ -z "$quiet" ] && echo "$1 not in $BIBBASE. Rogue entry." >&2
+		return 3
+	else
+		return 0
+	fi
 }
-
 
 # What about NUL?? Seems to break things in BASH.
 # _ -> \x5f
