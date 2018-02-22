@@ -118,22 +118,6 @@ function getpath {
 	result=$t
 }
 
-function printpath {
-	local i
-	while
-		i="$1"
-		shift
-	do
-		getpath "$i" || continue
-		fullpath="$BIBBASE/$result"
-		if isEntry "$fullpath"; then
-			echo "$fullpath"
-		else
-			echo "Not an entry: $fullpath" >&2
-		fi
-	done
-}
-
 function enc {
 	encodestring "$1"
 	echo "$result"
@@ -456,7 +440,6 @@ verbs+=("add" "getbib" "addget" "pdfset")
 verbs+=("list" "bibgrep" "summary")
 verbs+=("open" "notes" "bib")
 # Legacy, should go away at some point
-verbs+=("printpath")
 verbs+=("reflow")
 
 func="$1"
