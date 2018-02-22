@@ -474,13 +474,43 @@ verbs+=("open" "notes" "bib")
 # Legacy, should go away at some point
 verbs+=("reflow")
 
+usage="\
+-- Data entry --
+    init
+        label current directory as a database
+    addprot [protocol] ...
+        add protocols to the database
+    add [entry] ...
+        add an entry to the database.  Must be prefixed by a valid protocol.
+    getbib [entry] ...
+        fetch bibliographic data for entries
+    pdfset [entry] [pdf] ...
+        copies the file [pdf] into the pdf data for [entry]
+-- Data retrieval --
+    list [OPTION]
+        list all entries
+        OPTION: -c sort by creation time
+    bibgrep [regex]
+        search bibliographic data using grep like syntax
+    summnary [entry] ...
+        show a summary of [entry]
+    open [entry] ...
+        display entry PDF if present
+    notes [entry] ...
+        edit notes for [entry]
+    bib [entry] ...
+        display bibliographic data for [entry] (useful for BibTeX).
+"
+
 func="$1"
 shift
 if [ -z "$func" ]; then
+	echo "$0"
+	echo "Usage:-"
+	echo "$usage"
 	echo "Base directory:" "$BIBBASE"
 	declare -a paths=("$BIBBASE"/**/.entry)
 	echo "Number of entries:" "${#paths[*]}"
-	echo "Known verbs:" "${verbs[@]}"
 	exit 1
 elif [[ " ${verbs[@]} " == *" ${func} "* ]]; then
 	"$func" "$@"
