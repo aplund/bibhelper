@@ -328,49 +328,73 @@ function bibgrep {
 	done | sort -u
 }
 
+# Single argument only. Must be path to entry.
 function summary {
-	for i in "$@"; do
-		getpath $i || continue
-		echo $i
-		fullpath=$BIBBASE/$result
-		echo "Path:" $fullpath
-		if [ -f "$fullpath/bib" ]; then
-			awk -F "=" '
-			/author/ {print "Author:", gensub(/[[:space:]]*{(.*)}.*/, "\\1", "1", $2)}
-			/title/ {print "Title:", gensub(/[[:space:]]*{(.*)}.*/, "\\1", "1", $2)}
-			' "$fullpath/bib" | detex
-			 awk -F '=' '/url/ { print "URL:", gensub(/.*{(.*)}.*/, "\\1", "1",  $2) }' "$fullpath/bib"
-		else
-			echo "No bibliographic information"
-		fi
-		echo -n "PDF file: "
-		if [ -f "$fullpath/pdf" ]; then
-			echo "yes"
-		else
-			echo "no"
-		fi
-		echo
-	done
+	isEntry $1 || return 1
+
+	echo "Path:" $1
+	if [ -f "$1/bib" ]; then
+		awk -F "=" '
+		/author/ {print "Author:", gensub(/[[:space:]]*{(.*)}.*/, "\\1", "1", $2)}
+		/title/ {print "Title:", gensub(/[[:space:]]*{(.*)}.*/, "\\1", "1", $2)}
+		' "$1/bib" | detex
+		 awk -F '=' '/url/ { print "URL:", gensub(/.*{(.*)}.*/, "\\1", "1",  $2) }' "$1/bib"
+	else
+		echo "No bibliographic information"
+	fi
+	echo -n "PDF file: "
+	if [ -f "$1/pdf" ]; then
+		echo "yes"
+	else
+		echo "no"
+	fi
+	echo
 }
 
+# TODO: Add back in entry matching
 function list {
-	entries=("$BIBBASE"/**/.entry)
-	if [[ "$1" == "-c" ]]; then
-		entries=($(ls -c "$BIBBASE"/**/.entry))
+	local sorted="alpha"
+	local summary="no"
+	while getopts "cs" option; do
+		case $option in
+			"c") sorted="create" ;;
+			"s") summary="yes" ;;
+			*) echo "Unknown option $option" >&2 ;;
+		esac
+	done
+	shift $((OPTIND-1))
+
+	local -a entries
+	if [[ "$#" == "0" ]] ; then
+		entries=("$BIBBASE"/**/.entry)
+	else
+		entries=()
+		for e in "$@"; do
+			# We don't do globbing here
+			# Perhaps we should?
+			getpath "$e" || continue
+			entries+=("$BIBBASE/$result/.entry")
+		done
+	fi
+
+	if [[ "$sorted" == "create" ]]; then
+		entries=($(ls -c "${entries[@]}"))
 #Totally not working.  shell things don't seem to work here.
 #find $BIBBASE -type f -not -wholename '*/.*' -printf '%T@ %p\0' | sort -zn | while read -rd '' _ path; do echo "${path%/*}"; done
-#	elif [[ "$1" == "-u" ]]; then
+#	elif [[ "$sorted" == "access" ]]; then
 #		entries=("$BIBBASE"/**/.entry)
 #		entries=("${entries[@]%.entry}")
 #		echo "${entries[@]/%/*}"
 #		$(ls -u "${entries[@]}")
 #		echo "${entries[@]}"
-	elif [ -n "$1" ]; then
-		echo Unknown argument $1 >&2
-		exit 1
 	fi
-	for i in "${entries[@]}"; do
-		getentry "$i" && echo $result
+
+	for i in "${entries[@]%.entry}"; do
+		getentry "$i" || continue
+		echo $result
+		if [[ "$summary" == "yes" ]]; then
+			summary $i || continue
+		fi
 	done
 }
 
@@ -469,7 +493,7 @@ verbs=("init" "addprot")
 # Build data
 verbs+=("add" "getbib" "addget" "pdfset")
 # Show data
-verbs+=("list" "bibgrep" "summary")
+verbs+=("list" "bibgrep")
 verbs+=("open" "notes" "bib")
 # Legacy, should go away at some point
 verbs+=("reflow")
@@ -489,11 +513,11 @@ usage="\
 -- Data retrieval --
     list [OPTION]
         list all entries
-        OPTION: -c sort by creation time
+        OPTION:
+	    -c sort by creation time
+	    -s display longer summaries
     bibgrep [regex]
         search bibliographic data using grep like syntax
-    summnary [entry] ...
-        show a summary of [entry]
     open [entry] ...
         display entry PDF if present
     notes [entry] ...
