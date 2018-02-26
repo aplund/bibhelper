@@ -511,8 +511,8 @@ usage="\
     pdfset [entry] [pdf] ...
         copies the file [pdf] into the pdf data for [entry]
 -- Data retrieval --
-    list [OPTION]
-        list all entries
+    list [OPTION] [entry] ...
+        list specified entries or all if no entries given
         OPTION:
 	    -c sort by creation time
 	    -s display longer summaries
