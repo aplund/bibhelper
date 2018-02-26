@@ -499,7 +499,6 @@ verbs+=("open" "notes" "bib")
 verbs+=("reflow")
 
 usage="\
--- Data entry --
     init
         label current directory as a database
     addprot [protocol] ...
@@ -510,7 +509,6 @@ usage="\
         fetch bibliographic data for entries
     pdfset [entry] [pdf] ...
         copies the file [pdf] into the pdf data for [entry]
--- Data retrieval --
     list [OPTION] [entry] ...
         list specified entries or all if no entries given
         OPTION:
