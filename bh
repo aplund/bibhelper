@@ -314,18 +314,26 @@ function updatecache {
 }
 
 function bibgrep {
+	local summary="no"
+	if [[ "$1" == "-s" ]]; then
+		summary="yes"
+		shift
+	fi
 	updatecache
 	files=("$BIBBASE"/**/{bib,.cache.bib.detex})
 	mapfile -t ents < <(grep -l "$@" "${files[@]}" )
 	ents=("${ents[@]%.cache.bib.detex}")
 	ents=("${ents[@]%bib}")
+	mapfile -t ents < <(printf "%s\n" "${ents[@]}" | sort -u)
+
+
 	for i in "${ents[@]}"; do
-		getentry $i || {
-			echo "Not an entry $i" >&2
-			continue
-		}
+		getentry $i || continue
 		echo $result
-	done | sort -u
+		if [[ "$summary" == "yes" ]]; then
+			summary $i || continue
+		fi
+	done
 }
 
 # Single argument only. Must be path to entry.
